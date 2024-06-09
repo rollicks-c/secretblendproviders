@@ -2,6 +2,8 @@ package bitwarden
 
 import (
 	"fmt"
+	"github.com/rollicks-c/configcove"
+	"github.com/rollicks-c/secretblend"
 	"net/http"
 	"strings"
 )
@@ -11,6 +13,22 @@ type Client struct {
 }
 
 type Option func(c *Client)
+
+func Register() error {
+
+	// use defaults
+	appID := "bitwarden"
+	dataDir := configcove.ConfigDir(appID)
+
+	// register client
+	bw, err := NewClient(dataDir)
+	if err != nil {
+		return err
+	}
+	secretblend.AddProvider(bw, "bitwarden://")
+
+	return nil
+}
 
 func NewClient(dataDir string, options ...Option) (*Client, error) {
 

@@ -6,6 +6,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rollicks-c/configcove v0.0.0-20240609080305-31aebfcc8654 h1:9XXiPHRms2uS/jHwEy3Z9tB6tYGrUiEC76xUds8miYs=
 github.com/rollicks-c/configcove v0.0.0-20240609080305-31aebfcc8654/go.mod h1:p3/LmcTdDyCG2yEaUi0ujIJrOKo3tIRf1LQd7icjf8U=
+github.com/rollicks-c/configcove v0.0.0-20240609094024-56baa2fbd213 h1:6qzCzDpJOpn05CyfmwpQx+WTePt0qXQ42jcM+Sy8l0M=
+github.com/rollicks-c/configcove v0.0.0-20240609094024-56baa2fbd213/go.mod h1:p3/LmcTdDyCG2yEaUi0ujIJrOKo3tIRf1LQd7icjf8U=
 github.com/rollicks-c/secretblend v0.0.0-20240327181542-7d74a059ede7 h1:YS5lRRDtP5/DrAcdGTH4wm2yT2naWRvgF0f/uvFlt7Q=
 github.com/rollicks-c/secretblend v0.0.0-20240327181542-7d74a059ede7/go.mod h1:B9bSs/0Hihw2FwHddOktCvcvpfCj6CUbN4JQE1GtbFw=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
