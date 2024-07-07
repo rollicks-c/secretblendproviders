@@ -15,6 +15,7 @@ type TOTPData struct {
 type itemResponse struct {
 	Success bool     `json:"success"`
 	Data    ItemData `json:"data"`
+	Message string   `json:"message"`
 }
 
 type listResponse struct {
@@ -23,7 +24,7 @@ type listResponse struct {
 }
 
 type listData struct {
-	Data    []ItemData `json:"data"`
+	Data []ItemData `json:"data"`
 }
 
 type ItemData struct {

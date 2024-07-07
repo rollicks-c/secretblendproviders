@@ -48,6 +48,11 @@ func NewClient(dataDir string, options ...Option) (*Client, error) {
 		opt(client)
 	}
 
+	// get ready to accept requests
+	if client.init() != nil {
+		return nil, nil
+	}
+
 	return client, nil
 
 }
@@ -147,7 +152,7 @@ func (c Client) GetItem(id string) (ItemData, error) {
 		return ItemData{}, err
 	}
 	if !res.Success {
-		return ItemData{}, fmt.Errorf("failed to get item: %v", res)
+		return ItemData{}, fmt.Errorf("failed to get item: %v", res.Message)
 	}
 	return res.Data, nil
 
