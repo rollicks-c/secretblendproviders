@@ -171,3 +171,18 @@ func (c Client) GetTOTP(id string) (TOTPData, error) {
 	return res.Data, nil
 
 }
+
+func (c Client) Sync() error {
+
+	ep := "/sync"
+	res := genericResponse{}
+
+	if err := c.doTypedRequest(http.MethodPost, ep, nil, &res); err != nil {
+		return err
+	}
+	if !res.Success {
+		return fmt.Errorf("failed to sync bw vault: %v", res)
+	}
+	return nil
+
+}
