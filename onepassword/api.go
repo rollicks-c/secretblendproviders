@@ -70,7 +70,7 @@ func (c Client) LoadSecret(uri string) (string, error) {
 func (c Client) GetItem(id, field string) (string, error) {
 
 	// build command
-	cmd := exec.Command("op", "item", "get", id, "--field", field)
+	cmd := exec.Command("op", "item", "get", id, "--field", field, "--reveal")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 
