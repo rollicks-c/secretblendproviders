@@ -6,6 +6,8 @@ import (
 	"path"
 )
 
+type Secret map[string]string
+
 type Client struct {
 	authManager *authManager
 }
@@ -75,7 +77,13 @@ func WithToken(token string) Option {
 	}
 }
 
-func (c Client) LoadSecret(uri string) (string, error) {
+func (c Client) AsProvider() *Provider {
+	return &Provider{
+		client: &c,
+	}
+}
+
+func (c Client) LoadSecretValue(uri string) (string, error) {
 
 	vtPath := path.Dir(uri)
 	key := path.Base(uri)
@@ -93,7 +101,22 @@ func (c Client) LoadSecret(uri string) (string, error) {
 	return secret.(string), nil
 }
 
-func (c Client) ListSecret(path string) ([]string, error) {
+func (c Client) LoadSecret(path string) (Secret, error) {
+
+	dataRaw, err := c.loadSecret(path)
+	if err != nil {
+		return nil, err
+	}
+
+	data := map[string]string{}
+	for k, v := range dataRaw {
+		data[k] = v.(string)
+	}
+
+	return data, nil
+}
+
+func (c Client) ListSecretKeys(path string) ([]string, error) {
 
 	// login to vault
 	vt, err := c.authManager.getClient()
@@ -131,7 +154,7 @@ func (c Client) ListSecret(path string) ([]string, error) {
 
 }
 
-func (c Client) WriteSecret(path string, data map[string]interface{}) error {
+func (c Client) WriteSecret(path string, data Secret) error {
 
 	// login to vault
 	vt, err := c.authManager.getClient()
@@ -204,4 +227,16 @@ func (c Client) ReadValue(path, field string) (interface{}, error) {
 	// found
 	return value, nil
 
+}
+
+func CompareSecrets(s1, s2 Secret) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+	for k, v := range s1 {
+		if s2v, ok := s2[k]; !ok || s2v != v {
+			return false
+		}
+	}
+	return true
 }
