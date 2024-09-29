@@ -77,6 +77,8 @@
 				
 				<option value="file10">github.com/rollicks-c/secretblendproviders/vault/client.go (0.0%)</option>
 				
+				<option value="file11">github.com/rollicks-c/secretblendproviders/vault/provider.go (0.0%)</option>
+				
 				</select>
 			</div>
 			<div id="legend">
@@ -657,6 +659,8 @@ import (
         "path"
 )
 
+type Secret map[string]string
+
 type Client struct {
         authManager *authManager
 }
@@ -726,7 +730,13 @@ func WithToken(token string) Option <span class="cov0" title="0">{
         }
 }
 
-func (c Client) LoadSecret(uri string) (string, error) <span class="cov0" title="0">{
+func (c Client) AsProvider() *Provider <span class="cov0" title="0">{
+        return &amp;Provider{
+                client: &amp;c,
+        }
+}</span>
+
+func (c Client) LoadSecretValue(uri string) (string, error) <span class="cov0" title="0">{
 
         vtPath := path.Dir(uri)
         key := path.Base(uri)
@@ -744,7 +754,22 @@ func (c Client) LoadSecret(uri string) (string, error) <span class="cov0" title=
         <span class="cov0" title="0">return secret.(string), nil</span>
 }
 
-func (c Client) ListSecret(path string) ([]string, error) <span class="cov0" title="0">{
+func (c Client) LoadSecret(path string) (Secret, error) <span class="cov0" title="0">{
+
+        dataRaw, err := c.loadSecret(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">data := map[string]string{}
+        for k, v := range dataRaw </span><span class="cov0" title="0">{
+                data[k] = v.(string)
+        }</span>
+
+        <span class="cov0" title="0">return data, nil</span>
+}
+
+func (c Client) ListSecretKeys(path string) ([]string, error) <span class="cov0" title="0">{
 
         // login to vault
         vt, err := c.authManager.getClient()
@@ -782,7 +807,7 @@ func (c Client) ListSecret(path string) ([]string, error) <span class="cov0" tit
 
 }
 
-func (c Client) WriteSecret(path string, data map[string]interface{}) error <span class="cov0" title="0">{
+func (c Client) WriteSecret(path string, data Secret) error <span class="cov0" title="0">{
 
         // login to vault
         vt, err := c.authManager.getClient()
@@ -855,6 +880,18 @@ func (c Client) ReadValue(path, field string) (interface{}, error) <span class="
         // found
         <span class="cov0" title="0">return value, nil</span>
 
+}
+
+func CompareSecrets(s1, s2 Secret) bool <span class="cov0" title="0">{
+        if len(s1) != len(s2) </span><span class="cov0" title="0">{
+                return false
+        }</span>
+        <span class="cov0" title="0">for k, v := range s1 </span><span class="cov0" title="0">{
+                if s2v, ok := s2[k]; !ok || s2v != v </span><span class="cov0" title="0">{
+                        return false
+                }</span>
+        }
+        <span class="cov0" title="0">return true</span>
 }
 </pre>
 		
@@ -1073,6 +1110,17 @@ func (c Client) fixMetaPathForV2(secretPath string) string <span class="cov0" ti
         parts = append([]string{parts[0], "metadata"}, parts[1:]...)
         secretPath = strings.Join(parts, "/")
         return secretPath
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package vault
+
+type Provider struct {
+        client *Client
+}
+
+func (p Provider) LoadSecret(uri string) (string, error) <span class="cov0" title="0">{
+        return p.client.LoadSecretValue(uri)
 }</span>
 </pre>
 		
