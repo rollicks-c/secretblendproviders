@@ -49,8 +49,8 @@ func NewClient(dataDir string, options ...Option) (*Client, error) {
 	}
 
 	// get ready to accept requests
-	if client.init() != nil {
-		return nil, nil
+	if err := client.init(); err != nil {
+		return nil, err
 	}
 
 	return client, nil
