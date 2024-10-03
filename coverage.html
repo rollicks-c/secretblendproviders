@@ -142,8 +142,8 @@ func NewClient(dataDir string, options ...Option) (*Client, error) <span class="
         }</span>
 
         // get ready to accept requests
-        <span class="cov0" title="0">if client.init() != nil </span><span class="cov0" title="0">{
-                return nil, nil
+        <span class="cov0" title="0">if err := client.init(); err != nil </span><span class="cov0" title="0">{
+                return nil, err
         }</span>
 
         <span class="cov0" title="0">return client, nil</span>
