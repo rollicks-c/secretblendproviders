@@ -1,9 +1,7 @@
 package envvar
 
 import (
-	"fmt"
 	"github.com/rollicks-c/secretblend"
-	"os"
 )
 
 type Client struct {
@@ -22,7 +20,7 @@ func Register() error {
 
 func NewClient(options ...Option) *Client {
 
-	// create lient
+	// create client
 	client := &Client{}
 
 	// apply options
@@ -35,9 +33,9 @@ func NewClient(options ...Option) *Client {
 
 func (c Client) LoadSecret(uri string) (string, error) {
 
-	value, ok := os.LookupEnv(uri)
-	if !ok {
-		return "", fmt.Errorf("failed to load secret - envvar not provided: %s", uri)
+	value, err := injectVars(uri)
+	if err != nil {
+		return "", err
 	}
 
 	return value, nil
