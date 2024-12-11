@@ -65,19 +65,21 @@
 				
 				<option value="file4">github.com/rollicks-c/secretblendproviders/envvar/api.go (63.6%)</option>
 				
-				<option value="file5">github.com/rollicks-c/secretblendproviders/internal/network/api.go (0.0%)</option>
+				<option value="file5">github.com/rollicks-c/secretblendproviders/envvar/inject.go (100.0%)</option>
 				
-				<option value="file6">github.com/rollicks-c/secretblendproviders/internal/network/network.go (0.0%)</option>
+				<option value="file6">github.com/rollicks-c/secretblendproviders/internal/network/api.go (0.0%)</option>
 				
-				<option value="file7">github.com/rollicks-c/secretblendproviders/onepassword/api.go (0.0%)</option>
+				<option value="file7">github.com/rollicks-c/secretblendproviders/internal/network/network.go (0.0%)</option>
 				
-				<option value="file8">github.com/rollicks-c/secretblendproviders/vault/api.go (0.0%)</option>
+				<option value="file8">github.com/rollicks-c/secretblendproviders/onepassword/api.go (0.0%)</option>
 				
-				<option value="file9">github.com/rollicks-c/secretblendproviders/vault/auth.go (0.0%)</option>
+				<option value="file9">github.com/rollicks-c/secretblendproviders/vault/api.go (0.0%)</option>
 				
-				<option value="file10">github.com/rollicks-c/secretblendproviders/vault/client.go (0.0%)</option>
+				<option value="file10">github.com/rollicks-c/secretblendproviders/vault/auth.go (0.0%)</option>
 				
-				<option value="file11">github.com/rollicks-c/secretblendproviders/vault/provider.go (0.0%)</option>
+				<option value="file11">github.com/rollicks-c/secretblendproviders/vault/client.go (0.0%)</option>
+				
+				<option value="file12">github.com/rollicks-c/secretblendproviders/vault/provider.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -491,9 +493,7 @@ func (s apiServer) getURL() string <span class="cov0" title="0">{
 		<pre class="file" id="file4" style="display: none">package envvar
 
 import (
-        "fmt"
         "github.com/rollicks-c/secretblend"
-        "os"
 )
 
 type Client struct {
@@ -512,7 +512,7 @@ func Register() error <span class="cov0" title="0">{
 
 func NewClient(options ...Option) *Client <span class="cov8" title="1">{
 
-        // create lient
+        // create client
         client := &amp;Client{}
 
         // apply options
@@ -525,16 +525,56 @@ func NewClient(options ...Option) *Client <span class="cov8" title="1">{
 
 func (c Client) LoadSecret(uri string) (string, error) <span class="cov8" title="1">{
 
-        value, ok := os.LookupEnv(uri)
-        if !ok </span><span class="cov8" title="1">{
-                return "", fmt.Errorf("failed to load secret - envvar not provided: %s", uri)
+        value, err := injectVars(uri)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", err
         }</span>
 
         <span class="cov8" title="1">return value, nil</span>
 }
 </pre>
 		
-		<pre class="file" id="file5" style="display: none">package network
+		<pre class="file" id="file5" style="display: none">package envvar
+
+import (
+        "fmt"
+        "os"
+        "regexp"
+)
+
+func injectVars(exp string) (string, error) <span class="cov8" title="1">{
+
+        // regex to match $VAR or ${VAR}
+        re := regexp.MustCompile(`\$\{?([a-zA-Z_][a-zA-Z0-9_]*)\}?`)
+
+        // process all matches
+        missingValues := []string{}
+        result := re.ReplaceAllStringFunc(exp, func(match string) string </span><span class="cov8" title="1">{
+
+                // get var name
+                name := re.FindStringSubmatch(match)[1]
+
+                // replace
+                if value, exists := os.LookupEnv(name); exists </span><span class="cov8" title="1">{
+                        return value
+                }</span>
+
+                // remember missing values
+                <span class="cov8" title="1">missingValues = append(missingValues, name)
+                return match</span>
+        })
+
+        // report missing values
+        <span class="cov8" title="1">if len(missingValues) &gt; 0 </span><span class="cov8" title="1">{
+                return "", fmt.Errorf("failed to load secret - envvars not provided: %s", missingValues)
+        }</span>
+
+        <span class="cov8" title="1">return result, nil</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package network
 
 func FindFreePort(startPort int) int <span class="cov0" title="0">{
         for port := startPort; port &lt;= 65535; port++ </span><span class="cov0" title="0">{
@@ -546,7 +586,7 @@ func FindFreePort(startPort int) int <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file6" style="display: none">package network
+		<pre class="file" id="file7" style="display: none">package network
 
 import (
         "fmt"
@@ -563,7 +603,7 @@ func isPortAvailable(port int) bool <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file7" style="display: none">package onepassword
+		<pre class="file" id="file8" style="display: none">package onepassword
 
 import (
         "bytes"
@@ -651,7 +691,7 @@ func (c Client) GetItem(id, field string) (string, error) <span class="cov0" tit
 }
 </pre>
 		
-		<pre class="file" id="file8" style="display: none">package vault
+		<pre class="file" id="file9" style="display: none">package vault
 
 import (
         "fmt"
@@ -895,7 +935,7 @@ func CompareSecrets(s1, s2 Secret) bool <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file9" style="display: none">package vault
+		<pre class="file" id="file10" style="display: none">package vault
 
 import (
         "fmt"
@@ -1047,7 +1087,7 @@ func (tp *tokenProviderJWT) Authenticate(apiClient *api.Client) (*api.SecretAuth
 }
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package vault
+		<pre class="file" id="file11" style="display: none">package vault
 
 import (
         "fmt"
@@ -1113,7 +1153,7 @@ func (c Client) fixMetaPathForV2(secretPath string) string <span class="cov0" ti
 }</span>
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package vault
+		<pre class="file" id="file12" style="display: none">package vault
 
 type Provider struct {
         client *Client
