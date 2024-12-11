@@ -18,6 +18,15 @@ func Register() error {
 	return nil
 }
 
+func RegisterGlobally() error {
+
+	// register client
+	cl := NewClient()
+	secretblend.AddGlobalProvider(cl)
+
+	return nil
+}
+
 func NewClient(options ...Option) *Client {
 
 	// create client
