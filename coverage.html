@@ -63,7 +63,7 @@
 				
 				<option value="file3">github.com/rollicks-c/secretblendproviders/bitwarden/server.go (0.0%)</option>
 				
-				<option value="file4">github.com/rollicks-c/secretblendproviders/envvar/api.go (63.6%)</option>
+				<option value="file4">github.com/rollicks-c/secretblendproviders/envvar/api.go (50.0%)</option>
 				
 				<option value="file5">github.com/rollicks-c/secretblendproviders/envvar/inject.go (100.0%)</option>
 				
@@ -506,6 +506,15 @@ func Register() error <span class="cov0" title="0">{
         // register client
         op := NewClient()
         secretblend.AddProvider(op, "envvar://")
+
+        return nil
+}</span>
+
+func RegisterGlobally() error <span class="cov0" title="0">{
+
+        // register client
+        cl := NewClient()
+        secretblend.AddGlobalProvider(cl)
 
         return nil
 }</span>
