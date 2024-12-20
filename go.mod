@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/hashicorp/vault/api v1.15.0
-	github.com/rollicks-c/configcove v0.0.0-20241110232430-9299fb7ea299
+	github.com/rollicks-c/configcove v0.0.0-20241211101455-90a9a323ec65
 	github.com/rollicks-c/secretblend v0.0.0-20241211103734-6e1e1c8e86fb
 	github.com/rollicks-c/term v0.0.0-20241005142934-07a9e526c139
 	github.com/stretchr/testify v1.10.0
@@ -30,8 +30,8 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
-	golang.org/x/crypto v0.30.0 // indirect
-	golang.org/x/net v0.32.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.8.0 // indirect

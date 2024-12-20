@@ -54,6 +54,17 @@ func WithAppRole(roleID string, secretID string) Option {
 	}
 }
 
+func WithUserPass(username, password string) Option {
+	tp := tokenProviderUserPass{
+		username: username,
+		password: password,
+		authPath: "auth/userpass/login",
+	}
+	return func(c *Client) {
+		c.authManager.tokenProvider = tp
+	}
+}
+
 func WithJWT(authPath, role, jwt string) Option {
 	tp := &tokenProviderJWT{
 		jwt:      jwt,
