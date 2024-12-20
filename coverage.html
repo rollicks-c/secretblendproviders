@@ -77,9 +77,17 @@
 				
 				<option value="file10">github.com/rollicks-c/secretblendproviders/vault/auth.go (0.0%)</option>
 				
-				<option value="file11">github.com/rollicks-c/secretblendproviders/vault/client.go (0.0%)</option>
+				<option value="file11">github.com/rollicks-c/secretblendproviders/vault/auth_approle.go (0.0%)</option>
 				
-				<option value="file12">github.com/rollicks-c/secretblendproviders/vault/provider.go (0.0%)</option>
+				<option value="file12">github.com/rollicks-c/secretblendproviders/vault/auth_jwt.go (0.0%)</option>
+				
+				<option value="file13">github.com/rollicks-c/secretblendproviders/vault/auth_token.go (0.0%)</option>
+				
+				<option value="file14">github.com/rollicks-c/secretblendproviders/vault/auth_userpath.go (0.0%)</option>
+				
+				<option value="file15">github.com/rollicks-c/secretblendproviders/vault/client.go (0.0%)</option>
+				
+				<option value="file16">github.com/rollicks-c/secretblendproviders/vault/provider.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -756,6 +764,17 @@ func WithAppRole(roleID string, secretID string) Option <span class="cov0" title
         }</span>
 }
 
+func WithUserPass(username, password string) Option <span class="cov0" title="0">{
+        tp := tokenProviderUserPass{
+                username: username,
+                password: password,
+                authPath: "auth/userpass/login",
+        }
+        return func(c *Client) </span><span class="cov0" title="0">{
+                c.authManager.tokenProvider = tp
+        }</span>
+}
+
 func WithJWT(authPath, role, jwt string) Option <span class="cov0" title="0">{
         tp := &amp;tokenProviderJWT{
                 jwt:      jwt,
@@ -1042,18 +1061,13 @@ func (am *authManager) renewToken() error <span class="cov0" title="0">{
         am.tokenExp = &amp;expire
         return nil</span>
 }
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package vault
 
-type tokenProviderDirect struct {
-        token string
-}
-
-func (td tokenProviderDirect) Authenticate(apiClient *api.Client) (*api.SecretAuth, error) <span class="cov0" title="0">{
-        auth := &amp;api.SecretAuth{
-                ClientToken:   td.token,
-                LeaseDuration: 60 * 60,
-        }
-        return auth, nil
-}</span>
+import (
+        "github.com/hashicorp/vault/api"
+)
 
 type tokenProviderAppRole struct {
         roleID   string
@@ -1075,6 +1089,13 @@ func (tar tokenProviderAppRole) Authenticate(apiClient *api.Client) (*api.Secret
         // extract token and use
         <span class="cov0" title="0">return tokenData.Auth, nil</span>
 }
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package vault
+
+import (
+        "github.com/hashicorp/vault/api"
+)
 
 type tokenProviderJWT struct {
         jwt      string
@@ -1096,7 +1117,55 @@ func (tp *tokenProviderJWT) Authenticate(apiClient *api.Client) (*api.SecretAuth
 }
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package vault
+		<pre class="file" id="file13" style="display: none">package vault
+
+import (
+        "github.com/hashicorp/vault/api"
+)
+
+type tokenProviderDirect struct {
+        token string
+}
+
+func (td tokenProviderDirect) Authenticate(apiClient *api.Client) (*api.SecretAuth, error) <span class="cov0" title="0">{
+        auth := &amp;api.SecretAuth{
+                ClientToken:   td.token,
+                LeaseDuration: 60 * 60,
+        }
+        return auth, nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package vault
+
+import (
+        "fmt"
+        "github.com/hashicorp/vault/api"
+)
+
+type tokenProviderUserPass struct {
+        username string
+        password string
+        authPath string
+}
+
+func (up tokenProviderUserPass) Authenticate(apiClient *api.Client) (*api.SecretAuth, error) <span class="cov0" title="0">{
+
+        // login and get a token
+        authPath := fmt.Sprintf("%s/%s", up.authPath, up.username)
+        tokenData, err := apiClient.Logical().Write(authPath, map[string]interface{}{
+                "password": up.password,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // extract token and use
+        <span class="cov0" title="0">return tokenData.Auth, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package vault
 
 import (
         "fmt"
@@ -1162,7 +1231,7 @@ func (c Client) fixMetaPathForV2(secretPath string) string <span class="cov0" ti
 }</span>
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package vault
+		<pre class="file" id="file16" style="display: none">package vault
 
 type Provider struct {
         client *Client
