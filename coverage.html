@@ -63,7 +63,7 @@
 				
 				<option value="file3">github.com/rollicks-c/secretblendproviders/bitwarden/server.go (0.0%)</option>
 				
-				<option value="file4">github.com/rollicks-c/secretblendproviders/envvar/api.go (50.0%)</option>
+				<option value="file4">github.com/rollicks-c/secretblendproviders/envvar/api.go (43.8%)</option>
 				
 				<option value="file5">github.com/rollicks-c/secretblendproviders/envvar/inject.go (100.0%)</option>
 				
@@ -505,27 +505,34 @@ import (
 )
 
 type Client struct {
+        ignoreMissing bool
 }
 
 type Option func(c *Client)
 
-func Register() error <span class="cov0" title="0">{
+func Register(options ...Option) error <span class="cov0" title="0">{
 
         // register client
-        op := NewClient()
+        op := NewClient(options...)
         secretblend.AddProvider(op, "envvar://")
 
         return nil
 }</span>
 
-func RegisterGlobally() error <span class="cov0" title="0">{
+func RegisterGlobally(options ...Option) error <span class="cov0" title="0">{
 
         // register client
-        cl := NewClient()
+        cl := NewClient(options...)
         secretblend.AddGlobalProvider(cl)
 
         return nil
 }</span>
+
+func WithIgnoreMissing(ignoreMissing bool) Option <span class="cov0" title="0">{
+        return func(c *Client) </span><span class="cov0" title="0">{
+                c.ignoreMissing = ignoreMissing
+        }</span>
+}
 
 func NewClient(options ...Option) *Client <span class="cov8" title="1">{
 
@@ -542,7 +549,7 @@ func NewClient(options ...Option) *Client <span class="cov8" title="1">{
 
 func (c Client) LoadSecret(uri string) (string, error) <span class="cov8" title="1">{
 
-        value, err := injectVars(uri)
+        value, err := c.injectVars(uri)
         if err != nil </span><span class="cov8" title="1">{
                 return "", err
         }</span>
@@ -559,7 +566,7 @@ import (
         "regexp"
 )
 
-func injectVars(exp string) (string, error) <span class="cov8" title="1">{
+func (c Client) injectVars(exp string) (string, error) <span class="cov8" title="1">{
 
         // regex to match $VAR or ${VAR}
         re := regexp.MustCompile(`\$\{?([a-zA-Z_][a-zA-Z0-9_]*)\}?`)
@@ -582,7 +589,7 @@ func injectVars(exp string) (string, error) <span class="cov8" title="1">{
         })
 
         // report missing values
-        <span class="cov8" title="1">if len(missingValues) &gt; 0 </span><span class="cov8" title="1">{
+        <span class="cov8" title="1">if len(missingValues) &gt; 0 &amp;&amp; !c.ignoreMissing </span><span class="cov8" title="1">{
                 return "", fmt.Errorf("failed to load secret - envvars not provided: %s", missingValues)
         }</span>
 
