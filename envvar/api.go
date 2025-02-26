@@ -5,26 +5,33 @@ import (
 )
 
 type Client struct {
+	ignoreMissing bool
 }
 
 type Option func(c *Client)
 
-func Register() error {
+func Register(options ...Option) error {
 
 	// register client
-	op := NewClient()
+	op := NewClient(options...)
 	secretblend.AddProvider(op, "envvar://")
 
 	return nil
 }
 
-func RegisterGlobally() error {
+func RegisterGlobally(options ...Option) error {
 
 	// register client
-	cl := NewClient()
+	cl := NewClient(options...)
 	secretblend.AddGlobalProvider(cl)
 
 	return nil
+}
+
+func WithIgnoreMissing(ignoreMissing bool) Option {
+	return func(c *Client) {
+		c.ignoreMissing = ignoreMissing
+	}
 }
 
 func NewClient(options ...Option) *Client {
@@ -42,7 +49,7 @@ func NewClient(options ...Option) *Client {
 
 func (c Client) LoadSecret(uri string) (string, error) {
 
-	value, err := injectVars(uri)
+	value, err := c.injectVars(uri)
 	if err != nil {
 		return "", err
 	}
