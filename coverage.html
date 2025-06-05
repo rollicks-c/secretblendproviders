@@ -73,21 +73,23 @@
 				
 				<option value="file8">github.com/rollicks-c/secretblendproviders/onepassword/api.go (0.0%)</option>
 				
-				<option value="file9">github.com/rollicks-c/secretblendproviders/vault/api.go (0.0%)</option>
+				<option value="file9">github.com/rollicks-c/secretblendproviders/prompt/api.go (0.0%)</option>
 				
-				<option value="file10">github.com/rollicks-c/secretblendproviders/vault/auth.go (0.0%)</option>
+				<option value="file10">github.com/rollicks-c/secretblendproviders/vault/api.go (0.0%)</option>
 				
-				<option value="file11">github.com/rollicks-c/secretblendproviders/vault/auth_approle.go (0.0%)</option>
+				<option value="file11">github.com/rollicks-c/secretblendproviders/vault/auth.go (0.0%)</option>
 				
-				<option value="file12">github.com/rollicks-c/secretblendproviders/vault/auth_jwt.go (0.0%)</option>
+				<option value="file12">github.com/rollicks-c/secretblendproviders/vault/auth_approle.go (0.0%)</option>
 				
-				<option value="file13">github.com/rollicks-c/secretblendproviders/vault/auth_token.go (0.0%)</option>
+				<option value="file13">github.com/rollicks-c/secretblendproviders/vault/auth_jwt.go (0.0%)</option>
 				
-				<option value="file14">github.com/rollicks-c/secretblendproviders/vault/auth_userpath.go (0.0%)</option>
+				<option value="file14">github.com/rollicks-c/secretblendproviders/vault/auth_token.go (0.0%)</option>
 				
-				<option value="file15">github.com/rollicks-c/secretblendproviders/vault/client.go (0.0%)</option>
+				<option value="file15">github.com/rollicks-c/secretblendproviders/vault/auth_userpath.go (0.0%)</option>
 				
-				<option value="file16">github.com/rollicks-c/secretblendproviders/vault/provider.go (0.0%)</option>
+				<option value="file16">github.com/rollicks-c/secretblendproviders/vault/client.go (0.0%)</option>
+				
+				<option value="file17">github.com/rollicks-c/secretblendproviders/vault/provider.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -715,7 +717,49 @@ func (c Client) GetItem(id, field string) (string, error) <span class="cov0" tit
 }
 </pre>
 		
-		<pre class="file" id="file9" style="display: none">package vault
+		<pre class="file" id="file9" style="display: none">package prompt
+
+import (
+        "fmt"
+        "github.com/rollicks-c/secretblend"
+        "github.com/rollicks-c/term"
+        "strings"
+)
+
+type Secret map[string]string
+
+type Client struct {
+}
+
+type Option func(c *Client)
+
+func Register() error <span class="cov0" title="0">{
+        secretblend.AddProvider(NewClient(), "prompt://")
+        return nil
+}</span>
+
+func NewClient(options ...Option) *Client <span class="cov0" title="0">{
+        client := &amp;Client{}
+        for _, opt := range options </span><span class="cov0" title="0">{
+                opt(client)
+        }</span>
+        <span class="cov0" title="0">return client</span>
+}
+
+func (c Client) LoadSecret(path string) (string, error) <span class="cov0" title="0">{
+
+        prompt := fmt.Sprintf("enter value for [%s]", path)
+        value, err := term.PromptSecret(prompt)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">value = strings.TrimSpace(value)
+        return value, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package vault
 
 import (
         "fmt"
@@ -970,7 +1014,7 @@ func CompareSecrets(s1, s2 Secret) bool <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package vault
+		<pre class="file" id="file11" style="display: none">package vault
 
 import (
         "fmt"
@@ -1070,7 +1114,7 @@ func (am *authManager) renewToken() error <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package vault
+		<pre class="file" id="file12" style="display: none">package vault
 
 import (
         "github.com/hashicorp/vault/api"
@@ -1098,7 +1142,7 @@ func (tar tokenProviderAppRole) Authenticate(apiClient *api.Client) (*api.Secret
 }
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package vault
+		<pre class="file" id="file13" style="display: none">package vault
 
 import (
         "github.com/hashicorp/vault/api"
@@ -1124,7 +1168,7 @@ func (tp *tokenProviderJWT) Authenticate(apiClient *api.Client) (*api.SecretAuth
 }
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package vault
+		<pre class="file" id="file14" style="display: none">package vault
 
 import (
         "github.com/hashicorp/vault/api"
@@ -1143,7 +1187,7 @@ func (td tokenProviderDirect) Authenticate(apiClient *api.Client) (*api.SecretAu
 }</span>
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package vault
+		<pre class="file" id="file15" style="display: none">package vault
 
 import (
         "fmt"
@@ -1172,7 +1216,7 @@ func (up tokenProviderUserPass) Authenticate(apiClient *api.Client) (*api.Secret
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package vault
+		<pre class="file" id="file16" style="display: none">package vault
 
 import (
         "fmt"
@@ -1238,7 +1282,7 @@ func (c Client) fixMetaPathForV2(secretPath string) string <span class="cov0" ti
 }</span>
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">package vault
+		<pre class="file" id="file17" style="display: none">package vault
 
 type Provider struct {
         client *Client
