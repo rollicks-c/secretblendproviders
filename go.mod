@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/vault/api v1.16.0
 	github.com/rollicks-c/configcove v0.0.0-20241211101455-90a9a323ec65
 	github.com/rollicks-c/secretblend v0.0.0-20250218233906-02a2d7dff695
-	github.com/rollicks-c/term v0.0.0-20241005142934-07a9e526c139
+	github.com/rollicks-c/term v0.0.0-20250504154926-c20dd058d36a
 	github.com/stretchr/testify v1.10.0
 )
 
