@@ -1,11 +1,13 @@
 package bitwarden
 
 import (
+	"errors"
 	"fmt"
-	"github.com/rollicks-c/configcove"
-	"github.com/rollicks-c/secretblend"
 	"net/http"
 	"strings"
+
+	"github.com/rollicks-c/configcove"
+	"github.com/rollicks-c/secretblend"
 )
 
 type Client struct {
@@ -89,7 +91,7 @@ func (c Client) Check() error {
 		return err
 	}
 	if !res.Success {
-		return fmt.Errorf(res.Message)
+		return errors.New(res.Message)
 	}
 	return nil
 
@@ -104,10 +106,7 @@ func (c Client) IsLocked() (bool, error) {
 	if err.Error() == "Vault is locked." {
 		return true, nil
 	}
-	if err != nil {
-		return true, err
-	}
-	return false, nil
+	return true, err
 
 }
 
@@ -124,7 +123,7 @@ func (c Client) Unlock(password string) error {
 		return err
 	}
 	if !res.Success {
-		return fmt.Errorf(res.Message)
+		return errors.New(res.Message)
 	}
 	return nil
 }
