@@ -42,7 +42,17 @@ type ItemData struct {
 	Notes           interface{}   `json:"notes"`
 	Favorite        bool          `json:"favorite"`
 	Login           itemLogin     `json:"login"`
+	Fields          []ItemField   `json:"fields"`
 	CollectionIds   []interface{} `json:"collectionIds"`
+}
+
+// ItemField is a Bitwarden custom field on an item.
+// Type: 0=Text, 1=Hidden, 2=Boolean, 3=Linked.
+type ItemField struct {
+	Name     string      `json:"name"`
+	Value    string      `json:"value"`
+	Type     int         `json:"type"`
+	LinkedId interface{} `json:"linkedId"`
 }
 
 type itemLogin struct {
