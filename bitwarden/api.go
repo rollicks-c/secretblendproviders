@@ -74,9 +74,64 @@ func (c Client) LoadSecret(uri string) (string, error) {
 	keyExp := parts[1]
 	switch keyExp {
 	case "username":
-		return item.Login.Username, nil
+		// Login.Username takes precedence; if empty (e.g. Identity-type
+		// item) fall back to Identity.Username so callers can address
+		// the identity field by its canonical name.
+		if item.Login.Username != "" {
+			return item.Login.Username, nil
+		}
+		return item.Identity.Username, nil
 	case "password":
 		return item.Login.Password, nil
+	// Card-type fields (item.Type == 3). Names match the JSON returned
+	// by `bw get item` so callers can request `number`, `code`, etc.
+	case "cardholderName":
+		return item.Card.CardholderName, nil
+	case "brand":
+		return item.Card.Brand, nil
+	case "number":
+		return item.Card.Number, nil
+	case "expMonth":
+		return item.Card.ExpMonth, nil
+	case "expYear":
+		return item.Card.ExpYear, nil
+	case "code":
+		return item.Card.Code, nil
+	// Identity-type fields (item.Type == 4).
+	case "title":
+		return item.Identity.Title, nil
+	case "firstName":
+		return item.Identity.FirstName, nil
+	case "middleName":
+		return item.Identity.MiddleName, nil
+	case "lastName":
+		return item.Identity.LastName, nil
+	case "address1":
+		return item.Identity.Address1, nil
+	case "address2":
+		return item.Identity.Address2, nil
+	case "address3":
+		return item.Identity.Address3, nil
+	case "city":
+		return item.Identity.City, nil
+	case "state":
+		return item.Identity.State, nil
+	case "postalCode":
+		return item.Identity.PostalCode, nil
+	case "country":
+		return item.Identity.Country, nil
+	case "company":
+		return item.Identity.Company, nil
+	case "email":
+		return item.Identity.Email, nil
+	case "phone":
+		return item.Identity.Phone, nil
+	case "ssn":
+		return item.Identity.SSN, nil
+	case "passportNumber":
+		return item.Identity.PassportNumber, nil
+	case "licenseNumber":
+		return item.Identity.LicenseNumber, nil
 	default:
 		return "", fmt.Errorf("invalid key: %s", keyExp)
 	}

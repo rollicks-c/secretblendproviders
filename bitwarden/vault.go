@@ -42,8 +42,45 @@ type ItemData struct {
 	Notes           interface{}   `json:"notes"`
 	Favorite        bool          `json:"favorite"`
 	Login           itemLogin     `json:"login"`
+	Card            ItemCard      `json:"card"`
+	Identity        ItemIdentity  `json:"identity"`
 	Fields          []ItemField   `json:"fields"`
 	CollectionIds   []interface{} `json:"collectionIds"`
+}
+
+// ItemCard mirrors the `card` object returned by `bw get item` for
+// Card-type vault entries (Type=3). Field names are kept as Bitwarden
+// reports them so callers can ask for `number`, `code`, `expMonth`, etc.
+type ItemCard struct {
+	CardholderName string `json:"cardholderName"`
+	Brand          string `json:"brand"`
+	Number         string `json:"number"`
+	ExpMonth       string `json:"expMonth"`
+	ExpYear        string `json:"expYear"`
+	Code           string `json:"code"`
+}
+
+// ItemIdentity mirrors the `identity` object returned by `bw get item`
+// for Identity-type vault entries (Type=4).
+type ItemIdentity struct {
+	Title          string `json:"title"`
+	FirstName      string `json:"firstName"`
+	MiddleName     string `json:"middleName"`
+	LastName       string `json:"lastName"`
+	Address1       string `json:"address1"`
+	Address2       string `json:"address2"`
+	Address3       string `json:"address3"`
+	City           string `json:"city"`
+	State          string `json:"state"`
+	PostalCode     string `json:"postalCode"`
+	Country        string `json:"country"`
+	Company        string `json:"company"`
+	Email          string `json:"email"`
+	Phone          string `json:"phone"`
+	SSN            string `json:"ssn"`
+	Username       string `json:"username"`
+	PassportNumber string `json:"passportNumber"`
+	LicenseNumber  string `json:"licenseNumber"`
 }
 
 // ItemField is a Bitwarden custom field on an item.
