@@ -106,11 +106,13 @@
 		<pre class="file" id="file0" style="display: none">package bitwarden
 
 import (
+        "errors"
         "fmt"
-        "github.com/rollicks-c/configcove"
-        "github.com/rollicks-c/secretblend"
         "net/http"
         "strings"
+
+        "github.com/rollicks-c/configcove"
+        "github.com/rollicks-c/secretblend"
 )
 
 type Client struct {
@@ -177,9 +179,64 @@ func (c Client) LoadSecret(uri string) (string, error) <span class="cov0" title=
         <span class="cov0" title="0">keyExp := parts[1]
         switch keyExp </span>{
         case "username":<span class="cov0" title="0">
-                return item.Login.Username, nil</span>
+                // Login.Username takes precedence; if empty (e.g. Identity-type
+                // item) fall back to Identity.Username so callers can address
+                // the identity field by its canonical name.
+                if item.Login.Username != "" </span><span class="cov0" title="0">{
+                        return item.Login.Username, nil
+                }</span>
+                <span class="cov0" title="0">return item.Identity.Username, nil</span>
         case "password":<span class="cov0" title="0">
                 return item.Login.Password, nil</span>
+        // Card-type fields (item.Type == 3). Names match the JSON returned
+        // by `bw get item` so callers can request `number`, `code`, etc.
+        case "cardholderName":<span class="cov0" title="0">
+                return item.Card.CardholderName, nil</span>
+        case "brand":<span class="cov0" title="0">
+                return item.Card.Brand, nil</span>
+        case "number":<span class="cov0" title="0">
+                return item.Card.Number, nil</span>
+        case "expMonth":<span class="cov0" title="0">
+                return item.Card.ExpMonth, nil</span>
+        case "expYear":<span class="cov0" title="0">
+                return item.Card.ExpYear, nil</span>
+        case "code":<span class="cov0" title="0">
+                return item.Card.Code, nil</span>
+        // Identity-type fields (item.Type == 4).
+        case "title":<span class="cov0" title="0">
+                return item.Identity.Title, nil</span>
+        case "firstName":<span class="cov0" title="0">
+                return item.Identity.FirstName, nil</span>
+        case "middleName":<span class="cov0" title="0">
+                return item.Identity.MiddleName, nil</span>
+        case "lastName":<span class="cov0" title="0">
+                return item.Identity.LastName, nil</span>
+        case "address1":<span class="cov0" title="0">
+                return item.Identity.Address1, nil</span>
+        case "address2":<span class="cov0" title="0">
+                return item.Identity.Address2, nil</span>
+        case "address3":<span class="cov0" title="0">
+                return item.Identity.Address3, nil</span>
+        case "city":<span class="cov0" title="0">
+                return item.Identity.City, nil</span>
+        case "state":<span class="cov0" title="0">
+                return item.Identity.State, nil</span>
+        case "postalCode":<span class="cov0" title="0">
+                return item.Identity.PostalCode, nil</span>
+        case "country":<span class="cov0" title="0">
+                return item.Identity.Country, nil</span>
+        case "company":<span class="cov0" title="0">
+                return item.Identity.Company, nil</span>
+        case "email":<span class="cov0" title="0">
+                return item.Identity.Email, nil</span>
+        case "phone":<span class="cov0" title="0">
+                return item.Identity.Phone, nil</span>
+        case "ssn":<span class="cov0" title="0">
+                return item.Identity.SSN, nil</span>
+        case "passportNumber":<span class="cov0" title="0">
+                return item.Identity.PassportNumber, nil</span>
+        case "licenseNumber":<span class="cov0" title="0">
+                return item.Identity.LicenseNumber, nil</span>
         default:<span class="cov0" title="0">
                 return "", fmt.Errorf("invalid key: %s", keyExp)</span>
         }
@@ -194,7 +251,7 @@ func (c Client) Check() error <span class="cov0" title="0">{
                 return err
         }</span>
         <span class="cov0" title="0">if !res.Success </span><span class="cov0" title="0">{
-                return fmt.Errorf(res.Message)
+                return errors.New(res.Message)
         }</span>
         <span class="cov0" title="0">return nil</span>
 
@@ -209,10 +266,7 @@ func (c Client) IsLocked() (bool, error) <span class="cov0" title="0">{
         <span class="cov0" title="0">if err.Error() == "Vault is locked." </span><span class="cov0" title="0">{
                 return true, nil
         }</span>
-        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
-                return true, err
-        }</span>
-        <span class="cov0" title="0">return false, nil</span>
+        <span class="cov0" title="0">return true, err</span>
 
 }
 
@@ -229,7 +283,7 @@ func (c Client) Unlock(password string) error <span class="cov0" title="0">{
                 return err
         }</span>
         <span class="cov0" title="0">if !res.Success </span><span class="cov0" title="0">{
-                return fmt.Errorf(res.Message)
+                return errors.New(res.Message)
         }</span>
         <span class="cov0" title="0">return nil</span>
 }
